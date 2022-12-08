@@ -20,11 +20,11 @@ const puzzle = (input, part) => {
 
     if (part == 1) {
         const result = Object.values(sizes).filter(s => s < 100000).reduce((sum, x) => sum += x, 0);
-        console.log(result);
+        return result;
     } else {
         const needed = 70000000 - 30000000;
         const result = Object.values(sizes).filter(s => s >= sizes['/'] - needed).sort((a, b) => a - b)[0];
-        console.log(result);
+        return result;
     }
 };
 

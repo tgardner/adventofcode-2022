@@ -1,7 +1,7 @@
 const puzzle = (input, part) => {
     // A Rock, B Paper, C Scissors
     // X Lose, Y Draw, Z win
-    const score = input.split("\n")
+    return input.split("\n")
         .filter(x => !!x.trim())
         .reduce((sum, x) => {
             const left = x[0] == 'A' ? 1 : x[0] == 'B' ? 2 : 3;
@@ -12,8 +12,6 @@ const puzzle = (input, part) => {
                 (right == 1 ? 0 : right == 2 ? 3 : 6) + ((left + right) % 3) + 1;
             return sum;
         }, 0);
-
-    console.log(score);
 };
 
 module.exports = puzzle;

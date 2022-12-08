@@ -1,4 +1,4 @@
-module.exports = (input, part) => {
+const puzzle = (input, part) => {
     const reverse = part != 1;
     const lines = input.split("\n").filter(x => !!x.trim());
     const moves = []; let moveStart = 0;
@@ -20,6 +20,7 @@ module.exports = (input, part) => {
         if (!reverse) toMove = toMove.reverse();
         stacks[moves[i][2] - 1] = [...toMove, ...stacks[moves[i][2] - 1]];
     }
-    const result = stacks.map(s => s[0]).join('');
-    console.log(result);
+    return stacks.map(s => s[0]).join('');
 };
+
+module.exports = puzzle;

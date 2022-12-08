@@ -8,16 +8,17 @@ if (args.length == 0 || isNaN(args[0])) {
 }
 
 const day = +args[0];
+const part = args.length >= 2 ? args[1] == '1' ? 1 : 2 : 1;
 const inputFile = `./day${day}.txt`;
 const sessionFile = './session.txt';
 
 const runPuzzle = () => {
     const puzzle = require(`./day${day}.js`);
     const input = fs.readFileSync(inputFile, 'utf-8');
-    const part = args.length >= 2 ? args[1] == '1' ? 1 : 2 : 1;
 
     // We'll strip out the \r depending on the filesystem we're running this from
-    puzzle(input.replace(/\r/g, ""), part);
+    const result = puzzle(input.replace(/\r/g, ""), part);
+    console.log(result);
 };
 
 if (!fs.existsSync(inputFile)) {

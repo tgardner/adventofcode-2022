@@ -7,15 +7,13 @@ const puzzle = (input, part) => {
             .map(x => x[0].split('')
                 .filter(y => x[1].indexOf(y) >= 0 && x[2].indexOf(y) >= 0));
 
-    const result = ans
+    return ans
         .map(x =>
             x.filter((v, i, s) => s.indexOf(v) == i)
                 .map(x => x.toLowerCase() == x ? x.charCodeAt(0) - 96 : x.charCodeAt(0) - 38)
                 .reduce((sum, x) => sum += x, 0)
         )
         .reduce((sum, x) => sum += x, 0);
-
-    console.log(result);
 };
 
 module.exports = puzzle;
