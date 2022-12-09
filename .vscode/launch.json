@@ -1,0 +1,29 @@
+{
+    "version": "1.0.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Part 1",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\aoc.js",
+            "args": [
+                "${file}", "1"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Part 2",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\aoc.js",
+            "args": [
+                "${file}", "2"
+            ]
+        }
+    ]
+}

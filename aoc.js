@@ -1,19 +1,20 @@
 const year = 2022;
 
 const fs = require('fs');
+const path = require('path');
 const https = require('https');
 const args = process.argv.slice(2);
-if (args.length == 0 || isNaN(args[0])) {
-    console.log(`node aoc day part`); process.exit(1);
+if (args.length == 0) {
+    console.log(`node aoc dayX.js part`); process.exit(1);
 }
 
-const day = +args[0];
+const day = +path.basename(args[0]).replace(/\D/g, '');
 const part = args.length >= 2 ? args[1] == '1' ? 1 : 2 : 1;
-const inputFile = `./day${day}.txt`;
-const sessionFile = './session.txt';
+const inputFile = args[0].replace('.js', '.txt');
+const sessionFile = path.join(path.dirname(inputFile), 'session.txt');
 
 const runPuzzle = () => {
-    const puzzle = require(`./day${day}.js`);
+    const puzzle = require(args[0]);
     const input = fs.readFileSync(inputFile, 'utf-8');
 
     // We'll strip out the \r depending on the filesystem we're running this from
@@ -24,14 +25,17 @@ const runPuzzle = () => {
 if (!fs.existsSync(inputFile)) {
     console.log("Retrieving input file");
     const session = fs.readFileSync(sessionFile);
-
-    https.request({
+    https.get({
         host: 'adventofcode.com',
         path: `/${year}/day/${day}/input`,
         headers: {
             "Cookie": `session=${session}`
         }
     }, res => {
+        if (res.statusCode != 200) {
+            console.log("Failed to retrieve input file - ", res.statusMessage);
+            return;
+        }
         res.on('data', chunk => fs.writeFileSync(inputFile, chunk, { flag: 'a' }));
         res.on('end', runPuzzle);
     }).end();

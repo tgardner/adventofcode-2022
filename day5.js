@@ -1,5 +1,5 @@
 const puzzle = (input, part) => {
-    const reverse = part != 1;
+    const reverse = part == 1;
     const lines = input.split("\n").filter(x => !!x.trim());
     const moves = []; let moveStart = 0;
     for (var i = 0; i < lines.length; ++i) {
@@ -17,7 +17,7 @@ const puzzle = (input, part) => {
     }
     for (var i = 0; i < moves.length; ++i) {
         let toMove = stacks[moves[i][1] - 1].splice(0, moves[i][0]);
-        if (!reverse) toMove = toMove.reverse();
+        if (reverse) toMove = toMove.reverse();
         stacks[moves[i][2] - 1] = [...toMove, ...stacks[moves[i][2] - 1]];
     }
     return stacks.map(s => s[0]).join('');
