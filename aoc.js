@@ -11,7 +11,7 @@ if (args.length == 0) {
 const day = +path.basename(args[0]).replace(/\D/g, '');
 const part = args.length >= 2 ? args[1] == '1' ? 1 : 2 : 1;
 const inputFile = args[0].replace('.js', '.txt');
-const sessionFile = path.join(path.dirname(inputFile), 'session.txt');
+const sessionFile = path.join(path.dirname(inputFile), '.session');
 
 const runPuzzle = () => {
     const puzzle = require(args[0]);
