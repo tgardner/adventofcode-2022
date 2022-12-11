@@ -5,30 +5,21 @@ const puzzle = (input, part) => {
     const cycles = [20, 60, 100, 140, 180, 220];
     const crt = [...Array(6).keys()].map(_ => [...Array(40).keys()]);
 
-    let t = 0;
     let x = 1;
-    let part1 = 0;
-    const tick = (t, x) => {
-        const t1 = t - 1;
-        crt[Math.floor(t1 / 40)][t1 % 40] = (Math.abs(x - (t1 % 40)) <= 1 ? '#' : ' ')
-        if (cycles.indexOf(t) >= 0) {
-            part1 += t * x;
-        }
-    };
-
+    const vals = [];
     for (let i = 0; i < moves.length; ++i) {
-        if (moves[i][0].startsWith('noop')) tick(++t, x);
+        if (moves[i][0].startsWith('noop')) vals.push(x);
         else if (moves[i][0].startsWith('addx')) {
-            tick(++t, x);
-            tick(++t, x);
+            vals.push(x);
+            vals.push(x);
             x += moves[i][1];
         }
     }
 
-    let part2 = '';
-    for (let i = 0; i < crt.length; ++i) {
-        part2 += crt[i].join('') + "\n";
-    }
+    const part1 = cycles.map(c => c * vals[c - 1]).reduce((sum, x) => sum += x, 0);
+    const part2 = crt
+        .map((l, i) => l.map((_, j) => Math.abs(j - vals[i * 40 + j]) <= 1 ? '#' : ' ').join(''))
+        .join("\n");
 
     return part == 1 ? part1 : part2;
 };
