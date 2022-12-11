@@ -1,20 +1,16 @@
 const puzzle = (input, part) => {
     const ints = (x) => x.match(/\d+/g).map(Number);
-    
-    const lines = input.split("\n").filter(x => !!x.trim());
-    const monkeys = [];
-    for (let i = 0; i < lines.length; ++i) {
-        if (lines[i].startsWith("Monkey")) {
-            monkeys.push({
-                items: ints(lines[++i]),
-                op: eval(`old => ${lines[++i].trim().replace('Operation: new = ', '')}`),
-                test: ints(lines[++i])[0],
-                t: ints(lines[++i])[0],
-                f: ints(lines[++i])[0],
-                i: 0
-            })
-        }
-    }
+    const monkeys = input.split("\n\n").map(x => {
+        const [_, its, op, test, t, f] = x.split("\n");
+        return {
+            items: ints(its),
+            op: eval(`old => ${op.trim().replace('Operation: new = ', '')}`),
+            test: ints(test)[0],
+            t: ints(t)[0],
+            f: ints(f)[0],
+            i: 0
+        };
+    });
 
     const rounds = part == 1 ? 20 : 10000;
     const lcm = monkeys.reduce((lcm, x) => lcm *= x.test, 1);
