@@ -16,9 +16,8 @@ const puzzle = (input, part) => {
     const lcm = monkeys.reduce((lcm, x) => lcm *= x.test, 1);
     const worry = part == 1 ? x => x / 3 : x => x % lcm;
 
-    for (var j = 0; j < rounds; ++j) {
-        for (let i = 0; i < monkeys.length; ++i) {
-            let m = monkeys[i];
+    for (var i = 0; i < rounds; ++i) {
+        for(const m of monkeys) {
             for (const it of m.items) {
                 const n = Math.floor(worry(m.op(it)));
                 if (n % m.test == 0) {
