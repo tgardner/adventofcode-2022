@@ -3,19 +3,19 @@ const puzzle = (input, part) => {
     const moves = lines.map(l => l.trim().split(' ')).map(x => [x[0], +x[1]]);
 
     const dir = {
-        L:[-1,0],
-        R:[1,0],
-        U:[0,1],
-        D:[0,-1]
+        L: [-1, 0],
+        R: [1, 0],
+        U: [0, 1],
+        D: [0, -1]
     };
 
     const n = part == 1 ? 2 : 10;
     const knots = [...new Array(n).keys()].map(_ => [0, 0]);
 
     const adjust = (H, T) => {
-        const d = [T[0] - H[0], T[1]- H[1]];
-        return Math.max(...d.map(x => Math.abs(x))) > 1 ? 
-            [H[0] + d[0] - Math.sign(d[0]), H[1] + d[1] - Math.sign(d[1])] : 
+        const d = [T[0] - H[0], T[1] - H[1]];
+        return Math.max(...d.map(x => Math.abs(x))) > 1 ?
+            [H[0] + d[0] - Math.sign(d[0]), H[1] + d[1] - Math.sign(d[1])] :
             T;
     };
 
