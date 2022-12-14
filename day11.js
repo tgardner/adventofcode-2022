@@ -1,5 +1,5 @@
+const { ints } = require('./common.js');
 const puzzle = (input, part) => {
-    const ints = (x) => x.match(/\d+/g).map(Number);
     const monkeys = input.split("\n\n").map(x => {
         const [_, its, op, test, t, f] = x.split("\n");
         return {

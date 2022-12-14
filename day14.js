@@ -1,3 +1,4 @@
+const { ints } = require('./common.js');
 const puzzle = (input, part) => {
     const fill = (st, end) => {
         const result = [];
@@ -8,10 +9,9 @@ const puzzle = (input, part) => {
         return result;
     }
 
-    const rocks = input.split("\n")
-        .filter(x => !!x.trim())
-        .map(x => x.split(' -> ').map(y => y.split(',').map(z => +z)))
-        .map((r) => r.map((c, i) => i == 0 ? [c] : fill(r[i - 1], c)).flat())
+    const rocks = input.split("\n").filter(x => !!x.trim())
+        .map(x => x.split(' -> ').map(ints))
+        .map(r => r.map((c, i) => i == 0 ? [c] : fill(r[i - 1], c)).flat())
         .flat();
 
     const maxY = Math.max(...rocks.map(x => x[1])) + 2;
@@ -27,13 +27,13 @@ const puzzle = (input, part) => {
         if (x[1] > maxY) return false;
 
         const offsets = [[0, 1], [-1, 1], [1, 1]];
-        const next = offsets.every(o => dfs([x[0] + o[0], x[1] + o[1]]));
+        const next = offsets.every(o => dfs(x.map((a, i) => a + o[i])));
         if (next) {
             blocked.add(x.toString());
             ++cnt;
         }
         return next;
-    }
+    };
 
     dfs([500, 0]);
 
