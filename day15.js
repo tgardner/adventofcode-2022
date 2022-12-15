@@ -8,35 +8,30 @@ const puzzle = (input, part) => {
         .map(([s, x], i) => [s, x, dist(s, x), i]);
 
     const part1 = (data, row = 2000000) => {
-        const union = ranges => ranges
-            .sort(([ax, ay], [bx, by]) => ax - bx || ay - by)
-            .reduce((r, a) => {
-                const last = r.at(-1) || [];
-                if (a[0] <= last[1] + 1) {
-                    if (last[1] < a[1]) last[1] = a[1];
-                } else {
-                    r.push(a);
-                }
-                return r;
-            }, []);
+        const ranges = [];
+        const beacons = new Set();
+        for (const [s, b, d] of data) {
+            const a = Math.abs(s[1] - row);
+            if (d - a >= 0) {
+                ranges.push([s[0] - (d - a), s[0] + (d - a) + 1]);
+            }
 
-        const ranges = data
-            .filter(([[, sy], , d]) => Math.abs(row - sy) < d)
-            .map(([[sx, sy], , d]) => {
-                const r = Math.abs(d - Math.abs(row - sy));
-                return [sx - r, sx + r];
-            });
+            if (b[1] - row == 0) {
+                beacons.add(b[0]);
+            }
+        }
+        ranges.sort((a, b) => a[0] - b[0]);
 
-        const merged = union(ranges)
-            .map(([start, end]) => Math.abs(end + 1 - start))
-            .reduce((sum, v) => sum + v);
-
-        const beacons = data
-            .filter(([, [, by]]) => by === row)
-            .filter(([, a], i, arr) => i === arr.findIndex(([, b]) => a[0] === b[0] && a[1] === b[1]))
-            .length;
-
-        return merged - beacons;
+        let result = 0;
+        let lastX = Number.NEGATIVE_INFINITY;
+        for (const range of ranges) {
+            if (range[0] < lastX) range[0] = lastX;
+            if (range[1] <= lastX) continue;
+            result += range[1] - range[0];
+            lastX = range[1];
+        }
+        result -= beacons.size;
+        return result;
     };
 
     const part2 = (data, min = 0, max = 4000000) => {
