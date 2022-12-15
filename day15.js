@@ -37,7 +37,7 @@ const puzzle = (input, part) => {
     const part2 = (data, min = 0, max = 4000000) => {
         const freq = (x, y) => x * 4000000 + y;
         const valid = (x, y) => {
-            if (x < min || y <= min || x > max || y > max) return false;
+            if (x < min || y < min || x > max || y > max) return false;
             return data.every(([s, , d]) => d < dist(s, [x, y]));
         }
 
