@@ -15,11 +15,14 @@ const sessionFile = path.join(path.dirname(inputFile), '.session');
 
 const runPuzzle = () => {
     const puzzle = require(args[0]);
-    const input = fs.readFileSync(inputFile, 'utf-8');
-
     // We'll strip out the \r depending on the filesystem we're running this from
-    const result = puzzle(input.replace(/\r/g, ""), part);
+    const input = fs.readFileSync(inputFile, 'utf-8').replace(/\r/g, "");
+
+    const startTime = performance.now();
+    const result = puzzle(input, part);
+    const endTime = performance.now();
     console.log(result);
+    console.debug(`Execution time: ${endTime - startTime}ms`);
 };
 
 if (!fs.existsSync(inputFile)) {
