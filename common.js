@@ -1,4 +1,4 @@
-const ints = (x) => x.match(/\d+/g).map(Number);
+const ints = (x) => x.match(/(-?\d)+/g).map(Number);
 
 module.exports = {
     ints
