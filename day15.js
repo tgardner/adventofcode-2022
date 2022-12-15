@@ -39,6 +39,26 @@ const puzzle = (input, part) => {
         if (x < min || y <= min || x > max || y > max) return false;
         return lines.every(l => dist(...l) < dist(l[0], [x, y]));
     }
+    
+    // This was my original solution, it works, but slowly ~1min
+    // const diamond = (x, y, d) => {
+    //     const result = [];
+    //     for (let i = d; i >= 0; --i) {
+    //         result.push([x + i + 1, y - Math.abs(d - i)]);
+    //         result.push([x + i - 1, y + Math.abs(d - i)]);
+    //     }
+    //     return result;
+    // };
+    // outer: for (const [s, b] of lines) {
+    //     const d = dist(s, b);
+    //     const edges = diamond(s[0], s[1], d);
+    //     for (const edge of edges) {
+    //         if (valid(edge[0], edge[1])) {
+    //             part2 = freq(edge[0], edge[1]);
+    //             break outer;
+    //         }
+    //     }
+    // }
 
     outer: for (const [s1, b1] of lines) {
         const d1 = dist(s1, b1) + 1;
