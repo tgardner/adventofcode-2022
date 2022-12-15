@@ -1,89 +1,90 @@
 const { ints } = require('./common.js');
 const puzzle = (input, part) => {
-    const lines = input.split("\n").filter(x => !!x.trim())
+    const dist = ([ax, ay], [bx, by]) => Math.abs(ax - bx) + Math.abs(ay - by);
+
+    const data = input.split("\n").filter(x => !!x.trim())
         .map(ints)
-        .map(x => x.reduce((r, e, i) => (i % 2 ? r[r.length - 1].push(e) : r.push([e])) && r, []));
+        .map(([sx, sy, bx, by]) => [[sx, sy], [bx, by]])
+        .map(([s, x], i) => [s, x, dist(s, x), i]);
 
-    let part1 = 0;
-    const targetY = 2000000;
-    const dist = (s, e) => s.map((x, i) => Math.abs(x - e[i])).reduce((s, x) => s += x, 0);
+    const part1 = (data, row = 2000000) => {
+        const union = ranges => ranges
+            .sort(([ax, ay], [bx, by]) => ax - bx || ay - by)
+            .reduce((r, a) => {
+                const last = r.at(-1) || [];
+                if (a[0] <= last[1] + 1) {
+                    if (last[1] < a[1]) last[1] = a[1];
+                } else {
+                    r.push(a);
+                }
+                return r;
+            }, []);
 
-    const ranges = [];
-    const beacons = new Set();
-    for (const [s, b] of lines) {
-        const d = dist(s, b);
-        const a = Math.abs(s[1] - targetY);
-        if (d - a >= 0) {
-            ranges.push([s[0] - (d - a), s[0] + (d - a) + 1]);
+        const ranges = data
+            .filter(([[, sy], , d]) => Math.abs(row - sy) < d)
+            .map(([[sx, sy], , d]) => {
+                const r = Math.abs(d - Math.abs(row - sy));
+                return [sx - r, sx + r];
+            });
+
+        const merged = union(ranges)
+            .map(([start, end]) => Math.abs(end + 1 - start))
+            .reduce((sum, v) => sum + v);
+
+        const beacons = data
+            .filter(([, [, by]]) => by === row)
+            .filter(([, a], i, arr) => i === arr.findIndex(([, b]) => a[0] === b[0] && a[1] === b[1]))
+            .length;
+
+        return merged - beacons;
+    };
+
+    const part2 = (data, min = 0, max = 4000000) => {
+        const freq = (x, y) => x * 4000000 + y;
+        const valid = (x, y) => {
+            if (x < min || y <= min || x > max || y > max) return false;
+            return data.every(([s, , d]) => d < dist(s, [x, y]));
         }
 
-        if (b[1] - targetY == 0) {
-            beacons.add(b[0]);
-        }
-    }
-    ranges.sort((a, b) => a[0] - b[0]);
+        // This was my original solution, it works, but slowly ~1min
+        // const diamond = (x, y, d) => {
+        //     const result = [];
+        //     for (let i = d; i >= 0; --i) {
+        //         result.push([x + i + 1, y - Math.abs(d - i)]);
+        //         result.push([x + i - 1, y + Math.abs(d - i)]);
+        //     }
+        //     return result;
+        // };
+        // outer: for (const [s, b] of data) {
+        //     const d = dist(s, b);
+        //     const edges = diamond(s[0], s[1], d);
+        //     for (const p of edges) {
+        //         if (valid(...p)) return freq(...p);
+        //     }
+        // }
 
-    let lastX = Number.NEGATIVE_INFINITY;
-    for (let i = 0; i < ranges.length; ++i) {
-        if (ranges[i][0] < lastX) ranges[i][0] = lastX;
-        if (ranges[i][1] <= lastX) continue;
-        part1 += ranges[i][1] - ranges[i][0];
-        lastX = ranges[i][1];
-    }
-    part1 -= beacons.size;
+        for (const [s1, , dx] of data) {
+            const d1 = dx + 1;
+            const [x1, y1] = s1;
+            for (const [s2, , dy] of data) {
+                const d2 = dy + 1;
+                const [x2, y2] = s2;
 
-    let part2 = 0;
-    const [min, max] = [0, 4000000];
-    const freq = (x, y) => x * 4000000 + y;
-    const valid = (x, y) => {
-        if (x < min || y <= min || x > max || y > max) return false;
-        return lines.every(l => dist(...l) < dist(l[0], [x, y]));
-    }
-    
-    // This was my original solution, it works, but slowly ~1min
-    // const diamond = (x, y, d) => {
-    //     const result = [];
-    //     for (let i = d; i >= 0; --i) {
-    //         result.push([x + i + 1, y - Math.abs(d - i)]);
-    //         result.push([x + i - 1, y + Math.abs(d - i)]);
-    //     }
-    //     return result;
-    // };
-    // outer: for (const [s, b] of lines) {
-    //     const d = dist(s, b);
-    //     const edges = diamond(s[0], s[1], d);
-    //     for (const edge of edges) {
-    //         if (valid(edge[0], edge[1])) {
-    //             part2 = freq(edge[0], edge[1]);
-    //             break outer;
-    //         }
-    //     }
-    // }
+                for (const xx1 of [d1, -d1]) for (const xx2 of [d2, -d2]) for (const xx3 of [y1 - y2, y2 - y1]) {
+                    const xx = x1 + x2 + xx1 + xx2 + xx3;
 
-    outer: for (const [s1, b1] of lines) {
-        const d1 = dist(s1, b1) + 1;
-        const [x1, y1] = s1;
-        for (const [s2, b2] of lines) {
-            const d2 = dist(s2, b2) + 1;
-            const [x2, y2] = s2;
+                    for (const yy1 of [d1, -d1]) for (const yy2 of [d2, -d2]) for (const yy3 of [x1 - x2, x2 - x1]) {
+                        const yy = y1 + y2 + yy1 + yy2 + yy3;
+                        const p = [xx / 2, yy / 2];
 
-            for (const xx1 of [d1, -d1]) for (const xx2 of [d2, -d2]) for (const xx3 of [y1 - y2, y2 - y1]) {
-                const xx = x1 + x2 + xx1 + xx2 + xx3;
-
-                for (const yy1 of [d1, -d1]) for (const yy2 of [d2, -d2]) for (const yy3 of [x1 - x2, x2 - x1]) {
-                    const yy = y1 + y2 + yy1 + yy2 + yy3;
-                    const p = [xx / 2, yy / 2];
-
-                    if (valid(...p)) {
-                        part2 = freq(...p);
-                        break outer;
+                        if (valid(...p)) return freq(...p);
                     }
                 }
             }
         }
-    }
+    };
 
-    return part == 1 ? part1 : part2;
+    return part == 1 ? part1(data) : part2(data);
 };
 
 module.exports = puzzle;
