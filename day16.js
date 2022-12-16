@@ -1,3 +1,4 @@
+const {memoize} = require("./common.js");
 const puzzle = (input, part) => {
     const data = input.split("\n").filter(x => !!x.trim())
         .map(l => l.match(/Valve ([A-Z]+).*rate=(\d+);.*valves? ([A-Z, ]+)$/))
@@ -14,7 +15,7 @@ const puzzle = (input, part) => {
         if (dist[i][j] > dist[i][k] + dist[k][j]) dist[i][j] = dist[i][k] + dist[k][j];
 
     const choose = (xs) => xs.map(([, , , x], i) => [x, xs.filter((_, j) => j != i)]);
-    const part1 = (cur, rest, t) => {
+    const dfs = (cur, rest, t) => {
         if (t <= 0) return 0;
         let best = 0;
         for (const [r, rr] of choose(rest)) {
@@ -25,6 +26,7 @@ const puzzle = (input, part) => {
         }
         return best;
     };
+    const part1 = memoize(dfs, (...args) => args.map(a => a.toString()).join('|'));
 
     const part2 = (cur, rest, t) => {
         if (t <= 0) return 0;
