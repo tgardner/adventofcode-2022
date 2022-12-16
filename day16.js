@@ -1,51 +1,45 @@
 const puzzle = (input, part) => {
     const data = input.split("\n").filter(x => !!x.trim())
         .map(l => l.match(/Valve ([A-Z]+).*rate=(\d+);.*valves? ([A-Z, ]+)$/))
-        .map(m => [m[1], [+m[2], m[3].split(', ')]]);
+        .map(([, id, f, tun], i) => [id, +f, tun.split(', '), i]);
 
-    const map = Object.fromEntries(data);
+    const start = data.findIndex(d => d[0] == 'AA');
 
-    const maxflow = (cur, opened, t) => {
+    // Floyd-Warshall
+    const dist = [...Array(data.length).keys()].map(_ => [...Array(data.length).keys()].map(_ => 99));
+    for (const [, , tunnels, i] of data) for (const tun of tunnels)
+        dist[i][data.findIndex(d => d[0] == tun)] = 1;
+
+    for (let k = 0; k < data.length; ++k) for (let i = 0; i < data.length; ++i) for (let j = 0; j < data.length; ++j)
+        if (dist[i][j] > dist[i][k] + dist[k][j]) dist[i][j] = dist[i][k] + dist[k][j];
+
+    const choose = (xs) => xs.map(([, , , x], i) => [x, xs.filter((_, j) => j != i)]);
+    const part1 = (cur, rest, t) => {
         if (t <= 0) return 0;
-        if (opened.indexOf(cur) >= 0) return 0;
-
         let best = 0;
-        const [f, tun] = map[cur];
-        const val = (t - 1) * f;
-        const cur_opened = opened.concat([cur]);
-        for (const adj of tun) {
-            if (val != 0) {
-                best = Math.max(best, val + maxflow(adj, cur_opened, t - 2));
-            }
-            best = Math.max(best, maxflow(adj, cur_opened, t - 1));
-        }
-        return best;
-    }
+        for (const [r, rr] of choose(rest)) {
+            if (dist[cur][r] >= t) continue;
 
-    const part1 = maxflow("AA", [], 30);
-
-    const part2 = (cur, opened, t) => {
-        if (t <= 0) return maxflow("AA", opened, 26);
-
-        best = 0;
-        const [f, tun] = map[cur];
-        for (const adj of tun)
-            best = Math.max(best, part2(adj, [...opened], t - 1));
-
-        if (opened.indexOf(cur) < 0 && f > 0) {
-            const cur_opened = opened.concat([cur]);
-            --t;
-            let sum = t * f;
-            for (const adj of tun)
-                best = Math.max(best, sum + part2(adj, cur_opened, t - 1))
+            const [, f] = data[r];
+            best = Math.max(best, f * (t - dist[cur][r] - 1) + part1(r, rr, t - dist[cur][r] - 1));
         }
         return best;
     };
 
-    return part == 1 ? part1 : part2('AA', [], 26);
+    const part2 = (cur, rest, t) => {
+        if (t <= 0) return 0;
+        let best = 0;
+        for (const [r, rr] of choose(rest)) {
+            if (dist[cur][r] >= t) continue;
+
+            const [, f] = data[r];
+            best = Math.max(best, f * (t - dist[cur][r] - 1) + part2(r, rr, t - dist[cur][r] - 1));
+        }
+        return Math.max(best, part1(start, rest, 26));
+    };
+
+    const flows = data.filter(([, f]) => f > 0);
+    return part == 1 ? part1(start, flows, 30) : part2(start, flows, 26);
 };
 
 module.exports = puzzle;
-
-//not 234
-//not 1084
