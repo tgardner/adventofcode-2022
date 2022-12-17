@@ -18,10 +18,12 @@ const memoize = (func, resolver) => {
     };
     memoized.cache = new Map();
     return memoized;
-}
+};
 
+const clamp = (x, min, max) => x < min ? min : x > max ? max : x;
 
 module.exports = {
     ints,
+    clamp,
     memoize
 };
