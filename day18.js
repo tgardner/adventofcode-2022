@@ -3,11 +3,11 @@ const puzzle = (input, part) => {
     const data = input.split("\n").filter(x => !!x.trim()).map(ints);
     const seen = new Set(data.map(x => x.toString()));
 
-    const offset = [[-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1]];
-    const adj = (p) => offset.map(a => a.map((o, i) => o + p[i]));
+    const offsets = [-1, 1].map(i => [[i, 0, 0], [0, i, 0], [0, 0, i]]).flat();
+    const adj = (p) => offsets.map(a => a.map((o, i) => o + p[i]));
 
-    const min = [Math.min(...data.map(x => x[0])), Math.min(...data.map(x => x[1])), Math.min(...data.map(x => x[2]))];
-    const max = [Math.max(...data.map(x => x[0])), Math.max(...data.map(x => x[1])), Math.max(...data.map(x => x[2]))];
+    const min = [...Array(3).keys()].map(i => Math.min(...data.map(x => x[i])));
+    const max = [...Array(3).keys()].map(i => Math.max(...data.map(x => x[i])));
 
     const outside = (p) => {
         if (seen.has(p)) return false;
