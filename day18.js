@@ -15,7 +15,7 @@ const puzzle = (input, part) => {
         const visited = new Set();
         let queue = [p];
         while (queue.length) {
-            const next = queue.shift();
+            const next = queue.pop();
             if (visited.has(next.toString())) continue;
             if (seen.has(next.toString())) continue;
             visited.add(next.toString())
