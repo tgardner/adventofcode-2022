@@ -64,5 +64,3 @@ const puzzle = (input, part) => {
 };
 
 module.exports = puzzle;
-
-// ans = 988
