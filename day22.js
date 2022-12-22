@@ -10,70 +10,46 @@ const puzzle = (input, part) => {
     let dir = 0;
 
     const maxX = Math.max(...lines.map(x => x.length));
-    const password = ([x, y], dir) => 1000 * (y + 1) + 4 * (x + 1) + dir;
-    const map = [];
-    let moves = [];
-    for (const line of lines) {
-        if ((match = line.match(/([0-9]+)([LR]?)/g))) {
-            moves = match.map(x => [x.slice(0, -1), x.slice(-1)]).flat();
-            continue;
-        }
-        const row = Array(maxX);
-        const p = line.split('');
-        row.splice(0, p.length, ...p);
-        map.push(row);
-    }
+    const map = lines.slice(0, -1)
+        .map(line => [...line.split(''), ...Array(maxX)].slice(0, maxX));
+    const moves = (matches = lines.slice(-1)[0]
+        .match(/([0-9]+)([LR]?)/g))
+        .map(x => [x.slice(0, -1), x.slice(-1)]).flat();
 
     let p = [map[0].findIndex(m => m == '.'), 0];
+
+    const next = ([x, y], dir, n) => {
+        let [dx, dy] = dirs[dir];
+        while (n > 0) {
+            let [nx, ny] = [(x + dx + maxX) % maxX, (y + dy + map.length) % map.length];
+            const pos = map[ny][nx];
+            if (pos == '#') break;
+            else if (pos == '.') [x, y] = [nx, ny];
+            else {
+                [dx, dy] = [dx + Math.sign(dx), dy + Math.sign(dy)]
+                continue;
+            }
+            n--;
+        }
+        return [x, y];
+    };
 
     const follow = () => {
         let [x, y] = p;
         while (moves.length) {
             const move = moves.shift();
 
-            if (!isNaN(move)) {
-                const [dx, dy] = dirs[dir];
-
-                // Follow direction n times
-                for (let i = 0; i < +move; ++i) {
-                    let [nx, ny] = [(x + dx + maxX) % maxX, (y + dy + map.length) % map.length];
-                    next = map[ny][nx];
-                    if (next == '#') break;
-                    else if (next == '.') {
-                        [x, y] = [nx, ny];
-                    }
-                    else {
-                        // wrap
-                        let i = 2;
-                        while (next != '.' && next != '#') {
-                            [nx, ny] = [(x + (i * dx) + maxX) % maxX, (y + (i * dy) + map.length) % map.length];
-                            next = map[ny][nx];
-                            i++;
-                            if (next == '.') {
-                                [x, y] = [nx, ny];
-                            }
-                        }
-                    }
-                }
-                //console.log(x, y);
-            } else {
-                // Change direction
+            if (!isNaN(move))
+                [x, y] = next([x, y], dir, +move);
+            // Change direction
+            else
                 dir = (dir + (move == 'R' ? 1 : -1) + dirs.length) % dirs.length;
-            }
         }
 
-        return password([x, y], dir);
+        return 1000 * (y + 1) + 4 * (x + 1) + dir;
     };
 
     return follow(p, dir, moves);
 };
 
 module.exports = puzzle;
-
-
-// not 174042
-// not 73354
-
-
-
-///73346?
